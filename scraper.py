@@ -16,6 +16,19 @@ def extract_next_links(url, resp):
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     return list()
+def domains_match(url):
+
+    domains = [
+        r".ics.uci.edu.",
+        r".cs.uci.edu.",
+        r"..informatics.uci.edu/.",
+        r"..stat.uci.edu/."
+    ]
+
+    for domain in domains:
+        if re.match(domain,url):
+            return True
+    return False
 
 def is_valid(url):
     # Decide whether to crawl this url or not. 
@@ -25,6 +38,14 @@ def is_valid(url):
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
             return False
+        if False ==domains_match(parsed.netloc):
+            print(url)
+            return False
+        fragment = parsed.fragment
+        # if fragment:
+        #     print("Fragment:", fragment)
+        # else:
+        #     print("No fragment in the URL")
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
