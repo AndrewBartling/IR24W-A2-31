@@ -1,2 +1,5 @@
 cbor
 requests
+nltk
+bs4
+lxml
