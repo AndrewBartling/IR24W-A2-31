@@ -15,14 +15,22 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
+
+    if resp.status != 200:
+        return resp.status
+    url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
+    #use set for stop word as it has O(1) access time, no need to loop over a list
+
+
+
     return list()
 def domains_match(url):
 
     domains = [
-        r".ics.uci.edu.",
-        r".cs.uci.edu.",
-        r"..informatics.uci.edu/.",
-        r"..stat.uci.edu/."
+        r".*\.ics\.uci\.edu.*",
+        r".*\.cs\.uci\.edu.*",
+        r".*\.informatics.uci.edu.*",
+        r".*\.stat.uci.edu.*"
     ]
 
     for domain in domains:
@@ -41,11 +49,7 @@ def is_valid(url):
         if False ==domains_match(parsed.netloc):
             print(url)
             return False
-        fragment = parsed.fragment
-        # if fragment:
-        #     print("Fragment:", fragment)
-        # else:
-        #     print("No fragment in the URL")
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -55,7 +59,8 @@ def is_valid(url):
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
-
+        ### possible save the url here to help with report
+        
     except TypeError:
         print ("TypeError for ", parsed)
         raise
