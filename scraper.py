@@ -1,5 +1,8 @@
 import re
 from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+import utils.tokenizer
+
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -20,6 +23,23 @@ def extract_next_links(url, resp):
         return resp.status
     url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
     #use set for stop word as it has O(1) access time, no need to loop over a list
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
