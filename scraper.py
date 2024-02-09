@@ -2,7 +2,7 @@ import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import utils.tokenizer
-
+from simhash import Simhash, SimhashIndex
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -18,32 +18,29 @@ def extract_next_links(url, resp):
     #         resp.raw_response.url: the url, again
     #         resp.raw_response.content: the content of the page!
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
-
-    if resp.status != 200:
-        return resp.status
     url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
-    #use set for stop word as it has O(1) access time, no need to loop over a list
+
+    if resp.status == 400:
+        return resp.status
+    
+    elif resp.status == 300:
+        #redirect
+        pass
+    elif resp.start == 200:
+        
+        #succcess token the webpagS
+        #save all words tokenized to get top 50 words 
+        #longest page in term of number of words 
+        pass
+
+    #include simhashing for simliarity
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #check for redirect?
 
     return list()
+
 def domains_match(url):
 
     domains = [
@@ -70,6 +67,10 @@ def is_valid(url):
             print(url)
             return False
 
+
+        #get rid of fragments 
+
+
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
@@ -79,8 +80,6 @@ def is_valid(url):
             + r"|epub|dll|cnf|tgz|sha1"
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
-        ### possible save the url here to help with report
-        
     except TypeError:
         print ("TypeError for ", parsed)
         raise
