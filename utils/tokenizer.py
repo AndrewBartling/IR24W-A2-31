@@ -1,6 +1,6 @@
 import re
 stopwords = set()
-with open("stopwords.txt",'r') as file:
+with open("utils\stopwords.txt",'r') as file:
     for line in file:
         stopwords.add(line.rstrip())
 
