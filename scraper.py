@@ -1,7 +1,7 @@
 import re
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-import utils.tokenizer
+import tokenizer
 from simhash import Simhash, SimhashIndex
 
 def scraper(url, resp):
