@@ -1,11 +1,8 @@
 import re
-from nltk.corpus import stopwords
-
-ntlk.download('stopwords')
-
-
-stop_words = set(stopwords.words('english'))
-
+stopwords = set()
+with open("stopwords.txt",'r') as file:
+    for line in file:
+        stopwords.add(line.rstrip())
 
 '''
 Runtime complexity for tokenize:
@@ -24,17 +21,12 @@ Runtime = O(n + m)
 credit to https://regex101.com for testing regular expression     
 
 '''    
-def tokenize(text:str) -> list:
-
-    tokens=[]
-    expression = "\b[a-z0-9]+\b"
-
-
-
-    tokens +=(re.findall(expression,line.lower()))
-    tokens = [token for token in tokens if token not in stop_words]
+def tokenize(text: str) -> list:
+    tokens = []
+    expression = r"\b[a-z0-9]+\b"
+    tokens += re.findall(expression, text.lower())
+    tokens = [token for token in tokens if token not in stopwords]
     return tokens
-
 '''
 Runtime complexity for computeWordFrequencies:
 
@@ -83,9 +75,3 @@ Total run time for running PartA.py is :
 runtime = O(n log n)
 as it's the largest growing time complexity 
 '''
-
-
-if __name__ == "__main__":
-    tokens = tokenize(sys.argv[1])
-    freqs = computeWordFrequencies(tokens)
-    print_frequencies(freqs)
