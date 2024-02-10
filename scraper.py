@@ -29,7 +29,7 @@ def extract_next_links(url, resp):
         elif resp.status == 300:
             #redirect
             pass
-        elif resp.start == 200:
+        elif resp.status == 200:
             #succcess token the webpage
             #save all words tokenized 
             #longest page in term of number of words 
@@ -38,18 +38,10 @@ def extract_next_links(url, resp):
             #now can tokenize the soup and grab any urls from it
 
 
-            size = resp.raw_response.content.headers.get('Content-Lenght')
+            size = resp.raw_response.content.headers.get('Content-Lenght')            
 
 
-
-
-            
-
-
-
-
-
-
+            print("size: ", size,"\n")
 
 
 
