@@ -1,9 +1,8 @@
 import re
 from urllib.parse import urlparse,urldefrag,urljoin
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup,SoupStrainer
 import tokenizer
 from simhash import Simhash, SimhashIndex
-import requests
 
 def scraper(url, resp):
     links = extract_next_links(url, resp)
@@ -35,13 +34,19 @@ def extract_next_links(url, resp):
         #succcess token the webpagS
         #save all words tokenized to get top 50 words 
         #longest page in term of number of words 
-        soup = BeautifulSoup(resp.raw_response.content,'html.parser')
-        print("links",soup)
+        links = BeautifulSoup(resp.raw_response.content,parse_only=SoupStrainer('a'))
+        text = BeautifulSoup(resp.raw_response.content,'html.parser')
+        #now can tokenize the soup and grab any urls from it
+        for i in links:
+            print(i," ",end="")
+            url.add(i)
+
     #include simhashing for simliarity
 
 
 
     #check for redirect?
+
 
     return list()
 
@@ -63,6 +68,7 @@ def is_valid(url):
     # Decide whether to crawl this url or not. 
     # If you decide to crawl it, return True; otherwise return False.
     # There are already some conditions that return False.
+    print("is_valid")
     try:
         parsed = urlparse(url)
         if parsed.scheme not in set(["http", "https"]):
@@ -70,9 +76,6 @@ def is_valid(url):
         if False ==domains_match(parsed.netloc):
             print(url)
             return False
-
-
-        
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
             + r"|png|tiff?|mid|mp2|mp3|mp4"
