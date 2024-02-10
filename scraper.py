@@ -5,9 +5,20 @@ import tokenizer
 from simhash import Simhash, SimhashIndex
 import httplib2
 
+max_words = 0
+max_words_url =""
+corpus = dict()
+
+def remove_fragment_from_url(url):
+    parsed_url = urlparse(url)
+    return parsed_url._replace(fragment='').geturl()
+
+
 def scraper(url, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
+
+
 
 def extract_next_links(url, resp):
     # Implementation required.
@@ -21,6 +32,8 @@ def extract_next_links(url, resp):
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     try:
 
+
+
         if resp.status == 400:
             return resp.error
 
@@ -29,8 +42,8 @@ def extract_next_links(url, resp):
             pass
         elif resp.status == 200:
             #succcess token the webpage
-
             largefile = False
+
             content_length = resp.raw_response.headers.get('Content-Length')
             if content_length and int(content_length) > 10 * 1024 * 1024:  
                 print("Skipping due to large content size:", resp.url)
@@ -44,31 +57,44 @@ def extract_next_links(url, resp):
 
             tokens,total_words =tokenizer.tokenize(text)
             
+            if total_words> max_words:
+                print("new max found: ", url)
+                max_words = total_words
+                max_words_url = url
+                with open("max_words.txt","w") as file:
+                    file.write(max_words, max_words_url)
+                
+
             min_word_count = 20 
              
             links = set()
             for link in soup.find_all('a'):
                 href = link.get('href')
+                href = remove_fragment_from_url(href)
+
                 if href and href.startswith(('http://', 'https://')):
                     links.add(href)
                 elif href:
                     links.add(urljoin(url, href))
-
-            if total_words < 20 and largefile:
-                #if a page has less than 20 words you shouldn't save it 
-                return list()
+                     
             with open("scrapered.txt","a")as file:
                 file.write(url +"\n")
 
-            return list(links)
+            if total_words < 20 and largefile:
+                #if a page has less than 20 words you shouldn't save it 
+                return list(links),dict(),int()
+
+            
+
+            return list(links),dict(),total_words
         #include simhashing for simliarity
 
 
-        return list(url)
+        return list(),dict(),int()
         #check for redirect?
     except Exception as e:
         print("ERROR: ",e)
-        return list()
+        return list(),dict(),int()
 
 
 def domains_match(url):

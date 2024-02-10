@@ -1,6 +1,6 @@
 import os
 import shelve
-
+import json
 from threading import Thread, RLock
 from queue import Queue, Empty
 
@@ -12,7 +12,9 @@ class Frontier(object):
         self.logger = get_logger("FRONTIER")
         self.config = config
         self.to_be_downloaded = list()
-        
+        self.corpus = dict()
+        self.largest_page = ""
+        self.largest_word_count = 0
         if not os.path.exists(self.config.save_file) and not restart:
             # Save file does not exist, but request to load save.
             self.logger.info(
@@ -70,3 +72,18 @@ class Frontier(object):
 
         self.save[urlhash] = (url, True)
         self.save.sync()
+
+    def save_words(self, words_dic):
+        
+        for key, value in  words_dic:
+            if key in self.corpus:
+                self.corpus[key] +=value
+            else:
+                self.corpus[key] = value
+        with open("corpus.json",'w')as json_file:
+            json.dump(self.corpus,json_file)
+
+    def compare_word_count(self,words_count,url):
+        if words_count > self.largest_word_count:
+            self.largest_word_count = words_count
+            self.largest_page = url
