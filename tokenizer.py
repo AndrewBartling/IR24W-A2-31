@@ -21,12 +21,12 @@ Runtime = O(n + m)
 credit to https://regex101.com for testing regular expression     
 
 '''    
-def tokenize(text: str) -> list:
+def tokenize(text: str):
     tokens = []
     expression = r"\b[a-z0-9]+\b"
     tokens += re.findall(expression, text.lower())
     tokens = [token for token in tokens if token not in stopwords]
-    return tokens
+    return tokens,len(tokens)
 '''
 Runtime complexity for computeWordFrequencies:
 

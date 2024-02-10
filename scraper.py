@@ -21,34 +21,52 @@ def extract_next_links(url, resp):
     url_pattern = r'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+'
     url = set()
 
-    
+    try:
 
-    if resp.status == 400:
-        return resp.status
-    
-    elif resp.status == 300:
-        #redirect
-        pass
-    elif resp.start == 200:
-        
-        #succcess token the webpagS
-        #save all words tokenized to get top 50 words 
-        #longest page in term of number of words 
-        links = BeautifulSoup(resp.raw_response.content,parse_only=SoupStrainer('a'))
-        text = BeautifulSoup(resp.raw_response.content,'html.parser')
-        #now can tokenize the soup and grab any urls from it
-        for i in links:
-            print(i," ",end="")
-            url.add(i)
+        if resp.status == 400:
+            return resp.status
 
-    #include simhashing for simliarity
+        elif resp.status == 300:
+            #redirect
+            pass
+        elif resp.start == 200:
+            #succcess token the webpage
+            #save all words tokenized 
+            #longest page in term of number of words 
+            links = BeautifulSoup(resp.raw_response.content,parse_only=SoupStrainer('a'))
+            text = BeautifulSoup(resp.raw_response.content,'html.parser')
+            #now can tokenize the soup and grab any urls from it
+
+
+            size = resp.raw_response.content.headers.get('Content-Lenght')
 
 
 
-    #check for redirect?
+
+            
 
 
-    return list()
+
+
+
+
+
+
+
+
+            for i in links:
+                print(i," ",end="")
+                url.add(i)
+
+        #include simhashing for simliarity
+
+
+
+        #check for redirect?
+    except Exception as e:
+        print("ERROR: ",e)
+        return list()
+
 
 def domains_match(url):
 
