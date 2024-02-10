@@ -33,6 +33,7 @@ def extract_next_links(url, resp):
             #succcess token the webpage
             #save all words tokenized 
             #longest page in term of number of words 
+            print(resp.raw_response.content)
             links = BeautifulSoup(resp.raw_response.content,parse_only=SoupStrainer('a'))
             text = BeautifulSoup(resp.raw_response.content,'html.parser')
             #now can tokenize the soup and grab any urls from it
