@@ -30,9 +30,13 @@ class Worker(Thread):
                 f"Downloaded {tbd_url}, status <{resp.status}>, "
                 f"using cache {self.config.cache_server}.")
             scraped_urls,token_dic,words_count = scraper.scraper(tbd_url, resp)
+
+
             for scraped_url in scraped_urls:
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)
             self.frontier.save_words(token_dic)
-            self.frontier.compare_word_count(tbd_url,words_count)
+            self.frontier.compare_word_count(words_count,tbd_url)
+            with open("Longest_page","w") as file:
+                json.dump((self.frontier.largest_page, self.frontier.largest_word_count),file)
             time.sleep(self.config.time_delay)

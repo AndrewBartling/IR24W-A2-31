@@ -5,9 +5,7 @@ import tokenizer
 from simhash import Simhash, SimhashIndex
 import httplib2
 
-max_words = 0
-max_words_url =""
-corpus = dict()
+
 
 def remove_fragment_from_url(url):
     parsed_url = urlparse(url)
@@ -15,8 +13,8 @@ def remove_fragment_from_url(url):
 
 
 def scraper(url, resp):
-    links = extract_next_links(url, resp)
-    return [link for link in links if is_valid(link)]
+    links,tokens_dic,total = extract_next_links(url, resp)
+    return [link for link in links if is_valid(link)],tokens_dic,total
 
 
 
@@ -32,8 +30,6 @@ def extract_next_links(url, resp):
     # Return a list with the hyperlinks (as strings) scrapped from resp.raw_response.content
     try:
 
-
-
         if resp.status == 400:
             return resp.error
 
@@ -47,7 +43,7 @@ def extract_next_links(url, resp):
             content_length = resp.raw_response.headers.get('Content-Length')
             if content_length and int(content_length) > 10 * 1024 * 1024:  
                 print("Skipping due to large content size:", resp.url)
-                largefile = True            
+                return list(),[],int()
             # Parse the HTML content using BeautifulSoup
             soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
             
@@ -56,14 +52,7 @@ def extract_next_links(url, resp):
             
 
             tokens,total_words =tokenizer.tokenize(text)
-            
-            if total_words> max_words:
-                print("new max found: ", url)
-                max_words = total_words
-                max_words_url = url
-                with open("max_words.txt","w") as file:
-                    file.write(max_words, max_words_url)
-                
+        
 
             min_word_count = 20 
              
@@ -77,24 +66,29 @@ def extract_next_links(url, resp):
                 elif href:
                     links.add(urljoin(url, href))
                      
-            with open("scrapered.txt","a")as file:
-                file.write(url +"\n")
+  
 
             if total_words < 20 and largefile:
-                #if a page has less than 20 words you shouldn't save it 
-                return list(links),dict(),int()
+                #if a page has less than 20 words you shouldn't save it
+                with open("error.txt","a" ) as file:
+                    file.write(url+": "+str(resp.status)+"largefile"+"\n")
 
-            
+                return list(links),dict({}),int(0)
 
-            return list(links),dict(),total_words
+            with open("scrapered.txt","a")as file:
+                file.write(url +"\n")        
+
+            return list(links),tokens,total_words
         #include simhashing for simliarity
 
+        with open("error.txt","a" ) as file:
+            file.write(url+": " +str(resp.status) +"\n")
 
-        return list(),dict(),int()
+        return list([]),dict({}),int(0)
         #check for redirect?
     except Exception as e:
-        print("ERROR: ",e)
-        return list(),dict(),int()
+        print("ERROR in scapering url: ",e)
+        return list([]),dict({}),int(0)
 
 
 def domains_match(url):
@@ -120,17 +114,17 @@ def is_valid(url):
         if parsed.scheme not in set(["http", "https"]):
             return False
         if False ==domains_match(parsed.netloc):
-            print(url)
+
             return False
 
         
         return not re.match(
             r".*\.(css|js|bmp|gif|jpe?g|ico"
-            + r"|png|tiff?|mid|mp2|mp3|mp4"
-            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf"
+            + r"|png|tiff?|mid|mp2|mp3|mp4|img|ima"
+            + r"|wav|avi|mov|mpeg|ram|m4v|mkv|ogg|ogv|pdf|mpg"
             + r"|ps|eps|tex|ppt|pptx|doc|docx|xls|xlsx|names"
             + r"|data|dat|exe|bz2|tar|msi|bin|7z|psd|dmg|iso"
-            + r"|epub|dll|cnf|tgz|sha1"
+            + r"|epub|dll|cnf|tgz|sha1|ps|ppsx"
             + r"|thmx|mso|arff|rtf|jar|csv"
             + r"|rm|smil|wmv|swf|wma|zip|rar|gz)$", parsed.path.lower())
         
