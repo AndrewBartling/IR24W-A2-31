@@ -74,6 +74,7 @@ class Frontier(object):
         self.save.sync()
 
     def save_words(self, words_list):
+        # saves the corpus of crawler to a text file for later for report
         if words_list:
             for i in words_list:
                 if i in self.corpus:

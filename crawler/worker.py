@@ -26,7 +26,6 @@ class Worker(Thread):
                     file.write("end")
                 break
             #here detect trap
-            
             resp = download(tbd_url, self.config, self.logger)
             self.logger.info(
                 f"Downloaded {tbd_url}, status <{resp.status}>, "
@@ -37,7 +36,6 @@ class Worker(Thread):
                 self.frontier.add_url(scraped_url)
             self.frontier.mark_url_complete(tbd_url)
             self.frontier.save_words(token_dic)
-            if token_dic:
-                with open("Longest_page","a") as file:
-                    file.write(tbd_url+","+str(words_count) +"\n")
+            with open("Longest_page","a") as file:
+                    file.write(tbd_url+", " + str(words_count))
             time.sleep(self.config.time_delay)

@@ -37,22 +37,24 @@ def extract_next_links(url, resp):
             #succcess token the webpage
             largefile = False
 
+            #check to see if the file's size and if it's too large reject it
             content_length = resp.raw_response.headers.get('Content-Length')
             if content_length and int(content_length) > 8 * 1024 * 1024:  
                 print("Skipping due to large content size:", resp.url)
                 with open("error.txt","a" ) as file:
                     file.write(url+": "+str(resp.status)+"too large file,skipped"+"\n")
                 return list(),[],int()
+
             # Parse the HTML content using BeautifulSoup
             soup = BeautifulSoup(resp.raw_response.content, 'html.parser')
             
             # Extract text content and count words
             text = soup.get_text()
-            
-
             tokens,total_words =tokenizer.tokenize(text)
 
             links = set()
+
+            #find all the links in the text and add them to a set to prevent duplicates
             for link in soup.find_all('a'):
                 href = link.get('href')
                 href = remove_fragment_from_url(href)
@@ -67,23 +69,24 @@ def extract_next_links(url, resp):
 
  
             if total_words < 30:
-                #if a page has less than 20 words you shouldn't save it
+                #if a page has less than 30 words you shouldn't save it
                 with open("error.txt","a" ) as file:
                     file.write(url+": "+str(resp.status)+"too little words skip"+"\n")
 
                 return links,dict({}),int(0)
 
+            #saved that the current url was scrapped successfuly
             with open("scrapered.txt","a")as file:
                 file.write(url +"\n")        
 
-
+            #return list of links, list of token, and int of total words to the crawler
             return links,tokens,total_words
 
+        # if the resp status isn't succesful save the url and it's error code 
         with open("error.txt","a" ) as file:
             file.write(url+": " +str(resp.status) +"\n")
 
         return list([]),dict({}),int(0)
-        #check for redirect?
     except Exception as e:
         print("ERROR in scapering url: ",e)
         return list([]),dict({}),int(0)
