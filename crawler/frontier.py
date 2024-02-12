@@ -74,21 +74,14 @@ class Frontier(object):
         self.save.sync()
 
     def save_words(self, words_list):
-
         if words_list:
             for i in words_list:
                 if i in self.corpus:
                     self.corpus[i] +=1
                 else:
                     self.corpus[i] =1
-
-
             with open("corpus.json",'w')as json_file:
                 json.dump(self.corpus,json_file)
-        else:
-            print("empty list")
 
-    def compare_word_count(self,words_count,url):
-        if words_count > self.largest_word_count:
-            self.largest_word_count = words_count
-            self.largest_page = url
+
+        
