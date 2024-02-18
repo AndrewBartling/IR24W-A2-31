@@ -1,5 +1,9 @@
 ABOUT
 -------------------------
+Andrew Bartlin - abartlin - 81583799
+
+
+
 This is the base implementation of a full crawler that uses a spacetime
 cache server to receive requests.
 
