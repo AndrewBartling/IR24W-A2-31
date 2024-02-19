@@ -3,9 +3,16 @@ import shelve
 import json
 from threading import Thread, RLock
 from queue import Queue, Empty
-
+from urllib.parse import urlparse, urljoin
 from utils import get_logger, get_urlhash, normalize
 from scraper import is_valid
+
+
+def get_domain_and_path(url):
+    parsed_url = urlparse(url)
+    return parsed_url.netloc + parsed_url.path
+
+
 
 class Frontier(object):
     def __init__(self, config, restart):
@@ -15,6 +22,8 @@ class Frontier(object):
         self.corpus = dict()
         self.largest_page = ""
         self.largest_word_count = 0
+        self.subdomains = dict()
+        self.subdomain_thres = 150
         if not os.path.exists(self.config.save_file) and not restart:
             # Save file does not exist, but request to load save.
             self.logger.info(
@@ -59,6 +68,16 @@ class Frontier(object):
         url = normalize(url)
         urlhash = get_urlhash(url)
         if urlhash not in self.save:
+            if get_domain_and_path(url) in self.subdomains:
+                self.subdomains[get_domain_and_path(url)] +=1
+            else:
+                self.subdomains[get_domain_and_path(url)] =1
+            
+        
+            if get_domain_and_path(url) in self.subdomains and self.subdomains[get_domain_and_path(url)] > self.subdomain_thres:
+                print("skip url reached depth of", self.subdomain_thres, "for url:",url,get_domain_and_path(url))
+                return
+
             self.save[urlhash] = (url, False)
             self.save.sync()
             self.to_be_downloaded.append(url)
@@ -72,6 +91,11 @@ class Frontier(object):
 
         self.save[urlhash] = (url, True)
         self.save.sync()
+        
+
+
+        with open("subdomains.json",'w')as json_file:
+            json.dump(self.subdomains,json_file)
 
     def save_words(self, words_list):
         # saves the corpus of crawler to a text file for later for report

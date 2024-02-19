@@ -66,7 +66,7 @@ runtime = O(n + n log n)
 def print_frequencies(frequencies:dict)->None:
 
     frequencies = sorted(frequencies.items(),key=lambda x: (-x[1],x[0]))
-    for key,values in frequencies:
+    for key,values in frequencies[:50]:
         print(key,"=",values)
     
 

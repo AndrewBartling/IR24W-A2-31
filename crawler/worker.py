@@ -37,5 +37,5 @@ class Worker(Thread):
             self.frontier.mark_url_complete(tbd_url)
             self.frontier.save_words(token_dic)
             with open("Longest_page","a") as file:
-                    file.write(tbd_url+", " + str(words_count))
+                    file.write(tbd_url+", " + str(words_count)+"\n")
             time.sleep(self.config.time_delay)
